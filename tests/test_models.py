@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -142,6 +142,19 @@ class TestProductModel(unittest.TestCase):
         for name, value in update_data.items():
             self.assertEqual(getattr(found_product, name), value)
 
+    def test_update_a_product_without_id_failure(self):
+        """It should fail when update a product without id to the database"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        product = Product.find(product.id)
+        product.id = None
+        product.description = "test_description"
+        self.assertRaises(DataValidationError, product.update)
+    
+
     def test_delete_a_product(self):
         """It should Delete a product from the database"""
         product = ProductFactory()
@@ -225,3 +238,87 @@ class TestProductModel(unittest.TestCase):
 
         for product in found_products:
             self.assertEqual(product.category, category)
+
+    def test_find_a_product_by_price(self):
+        """It should Find a product by price from the database"""
+        products = ProductFactory.create_batch(10)
+
+        for product in products:
+            product.id = None
+            product.create()
+
+        products = Product.all()
+        self.assertEqual(len(products), 10)
+        price = products[0].price
+        count_by_price = [product.price for product in products].count(price)
+
+        found_products = Product.find_by_price(price)
+        self.assertEqual(found_products.count(), count_by_price)
+
+        for product in found_products:
+            self.assertEqual(product.price, price)
+
+    def test_find_a_product_by_price_string(self):
+        """It should Find a product by price string from the database"""
+        products = ProductFactory.create_batch(10)
+
+        for product in products:
+            product.id = None
+            product.create()
+
+        products = Product.all()
+        self.assertEqual(len(products), 10)
+        price = products[0].price
+        count_by_price = [product.price for product in products].count(price)
+
+        found_products = Product.find_by_price(str(price))
+        self.assertEqual(found_products.count(), count_by_price)
+
+        for product in found_products:
+            self.assertEqual(product.price, price)
+
+    def test_deserialize_product(self):
+        """It should deserialize a product"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        data = product.serialize()
+        new_product = product.deserialize(data)
+
+        self.assertEqual(new_product.name, product.name)
+        self.assertEqual(new_product.description, product.description)
+        self.assertEqual(Decimal(new_product.price), product.price)
+        self.assertEqual(new_product.available, product.available)
+        self.assertEqual(new_product.category, product.category)
+
+    def test_deserialize_product_invalid_availability(self):
+        """It should fail deserializing a product when availability is not boolean"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        data = product.serialize()
+        data["available"] = "True"
+        self.assertRaises(DataValidationError, product.deserialize, data)
+    
+    def test_deserialize_product_no_data(self):
+        """It should fail deserializing a product when not providing data"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        data = product.serialize()
+        data["category"] = "test-category"
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_product_invalid_data(self):
+        """It should fail deserializing a product when provided an invalid category"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        self.assertRaises(DataValidationError, product.deserialize, None)
