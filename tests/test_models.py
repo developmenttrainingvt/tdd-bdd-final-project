@@ -153,7 +153,6 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         product.description = "test_description"
         self.assertRaises(DataValidationError, product.update)
-    
 
     def test_delete_a_product(self):
         """It should Delete a product from the database"""
@@ -303,7 +302,7 @@ class TestProductModel(unittest.TestCase):
         data = product.serialize()
         data["available"] = "True"
         self.assertRaises(DataValidationError, product.deserialize, data)
-    
+
     def test_deserialize_product_no_data(self):
         """It should fail deserializing a product when not providing data"""
         product = ProductFactory()
