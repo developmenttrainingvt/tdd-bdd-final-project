@@ -39,7 +39,8 @@ class ProductFactory(factory.Factory):
         "Banana",
         "Pots",
         "Towels",
-        "Ford","Chevy",
+        "Ford",
+        "Chevy",
         "Hammer",
         "Wrench"
     ])
@@ -47,10 +48,10 @@ class ProductFactory(factory.Factory):
     price = FuzzyDecimal(0.5, 2000.0, 2)
     available = FuzzyChoice([True, False])
     category = FuzzyChoice([
-        "UNKNOWN",
-        "CLOTHS",
-        "FOOD",
-        "HOUSEWARES",
-        "AUTOMOTIVE",
-        "TOOLS"
+        Category.UNKNOWN,
+        Category.CLOTHS,
+        Category.FOOD,
+        Category.HOUSEWARES,
+        Category.AUTOMOTIVE,
+        Category.TOOLS
     ])
