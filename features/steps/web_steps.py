@@ -105,12 +105,6 @@ def step_impl(context, element_name):
 ##################################################################
 
 ## UPDATE CODE HERE ##
-@when(u'I press the "Create" button')
-def step_impl(context):
-    # element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    context.driver.find_element_by_id("create-btn").click()
-
-
 @then(u'I should see the message "Success"')
 def step_impl(context):
     found = WebDriverWait(context.driver, context.wait_seconds).until(
@@ -121,18 +115,26 @@ def step_impl(context):
     )
     assert(found)
 
-@when(u'I press the "Clear" button')
-def step_impl(context):
-    context.driver.find_element_by_id("clear-btn").click()
+@when(u'I press the "{name}" button')
+def step_impl(context, name):
+    element_id = f"{name.lower()}-btn"
+    context.driver.find_element_by_id(element_id).click()
 
-@when(u'I press the "Search" button')
-def step_impl(context):
-    context.driver.find_element_by_id("search-btn").click()
+@then(u'I press the "{name}" button')
+def step_impl(context, name):
+    element_id = f"{name.lower()}-btn"
+    context.driver.find_element_by_id(element_id).click()
+
+@then(u'I should see "{text_string}" in the results')
+def step_impl(context, text_string):
+    element = context.driver.find_element(By.TAG_NAME, 'body')
+    assert(text_string in element.text)
 
 
-@when(u'I press the "Retrieve" button')
-def step_impl(context):
-    context.driver.find_element_by_id("retrieve-btn").click()
+@then(u'I should not see "{text_string}" in the results')
+def step_impl(context, text_string):
+    element = context.driver.find_element(By.TAG_NAME, 'body')
+    assert(text_string not in element.text)
 
 ##################################################################
 # This code works because of the following naming convention:
