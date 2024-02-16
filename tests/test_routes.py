@@ -243,7 +243,7 @@ class TestProductRoutes(TestCase):
         products = self._create_products(5)
         test_name = products[0].name
         count_by_name = [product.name for product in products].count(test_name)
-      
+
         response = self.client.get(f"{BASE_URL}?name={test_name}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         listed_products = response.get_json()
@@ -257,7 +257,7 @@ class TestProductRoutes(TestCase):
         products = self._create_products(5)
         test_category = products[0].category.name
         count_by_category = [product.category.name for product in products].count(test_category)
-      
+
         response = self.client.get(f"{BASE_URL}?category={test_category}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         listed_products = response.get_json()
@@ -271,7 +271,7 @@ class TestProductRoutes(TestCase):
         products = self._create_products(10)
         test_availablity = products[0].available
         count_by_availablity = [product.available for product in products].count(test_availablity)
-      
+
         response = self.client.get(f"{BASE_URL}?available={test_availablity}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         listed_products = response.get_json()

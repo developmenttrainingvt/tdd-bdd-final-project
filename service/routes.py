@@ -100,7 +100,7 @@ def get_products():
     Gets all the products
     This endpoint will read all products from the database
     """
-    app.logger.info(f"Reading a products")
+    app.logger.info("Reading products")
     name = request.args.get("name")
     category = request.args.get("category")
     availability = request.args.get("available")
@@ -169,7 +169,7 @@ def update_product(product_id):
             status.HTTP_404_NOT_FOUND,
             f"Product for id: {product_id} not found",
         )
-    
+
     product.deserialize(data)
     product.update()
     app.logger.info("Product with id [%s] updated!", product.id)
@@ -200,7 +200,7 @@ def delete_product(product_id):
             status.HTTP_404_NOT_FOUND,
             f"Product for id: {product_id} not found",
         )
-    
+
     product.delete()
     app.logger.info("Product with id [%s] deleted!", product.id)
 
