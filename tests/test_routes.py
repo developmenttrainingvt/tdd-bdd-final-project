@@ -28,10 +28,13 @@ import os
 import logging
 from decimal import Decimal
 from unittest import TestCase
+from unittest.mock import patch
+from flask import abort
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
 from tests.factories import ProductFactory
+
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -209,6 +212,14 @@ class TestProductRoutes(TestCase):
         response = self.client.put(f"{BASE_URL}/0", json=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_product_invalid_method(self):
+        """It should fail when trying to update a product using invalid method"""
+        test_product = self._create_products()[0]
+        data = test_product.serialize()
+        logging.debug("Test Product: %s", data)
+        response = self.client.patch(f"{BASE_URL}/{test_product.id}", json=data)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_delete_product(self):
         """It should Delete Products"""
         products = self._create_products(5)
@@ -228,6 +239,17 @@ class TestProductRoutes(TestCase):
         """It should fail when trying to delete a not found product"""
         response = self.client.delete(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("service.routes.Product.find")
+    def test_internal_error_handling(self, find_mock):
+        """It should handle unexpected errors properly"""
+        find_mock.side_effect = lambda id: abort(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "",
+        )
+        test_product = self._create_products()[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_get_product_list(self):
         """It should Get a list of Products"""
