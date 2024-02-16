@@ -127,13 +127,13 @@ def step_impl(context, name):
 
 @then(u'I should see "{text_string}" in the results')
 def step_impl(context, text_string):
-    element = context.driver.find_element(By.TAG_NAME, 'body')
+    element = context.driver.find_element_by_id('search_results')
     assert(text_string in element.text)
 
 
 @then(u'I should not see "{text_string}" in the results')
 def step_impl(context, text_string):
-    element = context.driver.find_element(By.TAG_NAME, 'body')
+    element = context.driver.find_element_by_id('search_results')
     assert(text_string not in element.text)
 
 ##################################################################
