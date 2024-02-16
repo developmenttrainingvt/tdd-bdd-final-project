@@ -105,6 +105,34 @@ def step_impl(context, element_name):
 ##################################################################
 
 ## UPDATE CODE HERE ##
+@when(u'I press the "Create" button')
+def step_impl(context):
+    # element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    context.driver.find_element_by_id("create-btn").click()
+
+
+@then(u'I should see the message "Success"')
+def step_impl(context):
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'flash_message'),
+            "Success"
+        )
+    )
+    assert(found)
+
+@when(u'I press the "Clear" button')
+def step_impl(context):
+    context.driver.find_element_by_id("clear-btn").click()
+
+@when(u'I press the "Search" button')
+def step_impl(context):
+    context.driver.find_element_by_id("search-btn").click()
+
+
+@when(u'I press the "Retrieve" button')
+def step_impl(context):
+    context.driver.find_element_by_id("retrieve-btn").click()
 
 ##################################################################
 # This code works because of the following naming convention:
